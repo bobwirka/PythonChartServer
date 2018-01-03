@@ -10,16 +10,27 @@ import json
 client_path = 'client/'
 chart_path = 'charts/'
 
-mime_types = [
-    'html',
-    'js',
-    'css',
-    'ts',
-    'map',
-    'json',
-    'ico',
-    'png'
-]
+# Mime types we support.
+mime_types = {
+    'html' : 'text/html' ,
+    'js'   : 'text/javascript' ,
+    'css'  : 'text/css' ,
+    'ts'   : 'text/plain' ,
+    'map'  : 'text/plain' ,
+    'json' : 'text/plain' ,
+    'ico'  : 'image/x-icon' ,
+    'png'  : 'image/png'
+}
+
+
+def is_binary_type(type):
+
+    """Returns true if mime type is binary"""
+
+    if type == 'ico' or type == 'png':
+        return True
+    return False
+
 
 ###############################################################
 #
@@ -143,6 +154,7 @@ class RequestHandler(BaseHTTPRequestHandler):
 
         result_code = 200
         content_type = 'text/html'
+        is_binary = False
 
         # Get the requested file with path.
         file_path = self.path
@@ -173,15 +185,19 @@ class RequestHandler(BaseHTTPRequestHandler):
                 rel_name = client_path + file_name
                 # If the file exists.
                 if os.path.isfile(rel_name):
+                    # Set mime type.
+                    content_type = mime_types[ext]
+                    # Set binary flag.
+                    is_binary = is_binary_type(ext)
                     # Open the file.
-                    fd = open(rel_name , 'r')
+                    if is_binary:
+                        fd = open(rel_name , 'rb')
+                    else:
+                        fd = open(rel_name , 'r')
                     # Read it.
                     file_data = fd.read()
                     # Close it.
                     fd.close()
-                    # If css was requested we must modify the content for IE.
-                    if ext == 'css':
-                        content_type = 'text/css'
                 # Else file does not exist.
                 else:
                     result_code = 404
@@ -196,7 +212,10 @@ class RequestHandler(BaseHTTPRequestHandler):
         self.send_header('Content-type' , content_type)
         self.end_headers()
         # Send the response.
-        self.wfile.write(bytes(file_data , 'UTF-8'))
+        if is_binary:
+            self.wfile.write(file_data)
+        else:
+            self.wfile.write(bytes(file_data , 'UTF-8'))
         return
 
     def do_POST(self):
