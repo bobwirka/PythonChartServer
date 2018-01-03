@@ -1,0 +1,33 @@
+2-Jan-2018		RCW
+
+Initial approach for this project is to provde an example of a framework that will display
+data in chart format using Chart.js.
+
+The server (Python or Node) will have five essential GET functions:
+	1. Return a list of available chart template files via GET url           '/charts/templates'
+	2. Return a list of available chart configuration files via GET url      '/charts/charts'
+	3. Return the template json file via GET url                             '/charts/templates/<templatename.json>'
+	4. Return the configuration JSON file for an available chart via GET url '/charts/charts/<chartname.json>'
+	5. Return the current chart data for an available chart via GET url      '/charts/data/<chartname.json>'
+
+Templates for the basic chart type configuration files are stored in 'charts/templates'. These JSON files will be used
+as a base for vertical bar, horizontal bar, scatter, etc., charts. These templates can be garnered from the Chart.js
+examples.
+
+A template JSON file can be copied into the 'charts' folder and given a new base name (keeping the
+'.json' extension. This file will then be available for display in a 'chart' <div> within the html.
+
+A template JSON file copied, renamed, and possibly modified from the templates folder is considered a
+chart 'configuration' file. Said file can be retrieved as a JSON object via url '/charts/config/<chartname.json>'. 
+
+Once a chart has been initialized, a GET to the 'data' url will return current data to be displayed.
+
+The html design can be dynamic in creating canvas <div>'s to display multiple data sets.
+
+A nice future feature would be to bring up a chart configuration window for a selected chart that would allow
+the user to modify colors, tics, horizontal/vertical, names, etc., and save these to the chart configuration
+file.
+
+The configuration feature would be done in TypeScript, as the chart.d.ts file will allow this to be done
+in a rational manner.
+
